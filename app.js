@@ -51,6 +51,7 @@ app.get('/okc', async function(req, res) {
         var p = parseP(req.query.p);
         const browser = await puppeteer.launch({
             // headless: false
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         const page = await browser.newPage();
         page.setViewport({ width: 1200, height: 800 })
