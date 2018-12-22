@@ -38,24 +38,26 @@ async function run() {
     await page.click(BUTTON_SELECTOR);
 
     // await page.waitForNavigation();
-    await page.waitFor(2*1000);
+    await page.waitFor(3*1000);
 
     await page.click(doubletake);
     // await page.waitForNavigation();
     for (i = 0; i < 200; i++) {
-        await page.waitFor(2*1000);
+        await page.waitFor(3*1000);
 
         await page.click(like);
         await page.waitFor(2*1000);
 
         await page.click(likedProf);
-        await page.waitFor(2*1000);
+        await page.waitFor(3*1000);
 
         let pages = await browser.pages();
 
+        await pages[2].waitFor(msgBtn);
         await pages[2].click(msgBtn);
         await pages[2].waitFor(1000);
 
+        await pages[2].waitFor(msgBox);
         await pages[2].type(msgBox, CREDS.msg, {delay: 20});
         await pages[2].waitFor(1*1000);
 
