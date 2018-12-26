@@ -94,6 +94,7 @@ app.get('/okc', async function(req, res) {
         for (i = 0; i < 200; i++) {
             await page.waitFor(3*1000);
 
+            await page.waitFor(like);
             await page.click(like);
             await page.waitFor(2*1000);
 
