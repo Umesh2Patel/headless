@@ -28,9 +28,5 @@
   "devDependencies": {
     "mocha": "^5.2.0",
     "nightmare": "^3.0.1"
-  },
-  "engines": {
-    "node": "8.11.1",
-    "npm": "5.6.0"
   }
 }
