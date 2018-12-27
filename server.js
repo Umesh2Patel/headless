@@ -1,55 +1,26 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const puppeteer = require('puppeteer');
-const app = express();
-const port = process.env.PORT || 8080;
-const validUrl = require('valid-url');
 const CREDS = require('./creds');
+const app = express();
+const port = process.env.PORT || 5000;
+var okcUser = '';
+var pwd = '';
+var msg = '';
 
-var parseUrl = function(url) {
-    url = decodeURIComponent(url);
-    if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
-        url = 'http://' + url;
-    }
-
-    return url;
-};
-
-var parseP = function(p) {
-    p = decodeURIComponent(p);
-    return p;
-};
-
-app.get('/', function(req, res) {
-    var urlToScreenshot = parseUrl(req.query.url);
-
-    if (validUrl.isWebUri(urlToScreenshot)) {
-        console.log('Screenshotting: ' + urlToScreenshot);
-        (async() => {
-            const browser = await puppeteer.launch({
-                args: ['--no-sandbox', '--disable-setuid-sandbox']
-            });
-
-            const page = await browser.newPage();
-            await page.goto(urlToScreenshot);
-            const imageBuffer = await page.screenshot();
-            browser.close();
-
-            res.set('Content-Type', 'image/png');
-            res.send(imageBuffer);
-        })();
-    } else {
-        res.send('Invalid url: ' + urlToScreenshot);
-    }
-
-});
-
-app.get('/okc', async function(req, res) {
+var okc = async function(body) {
+    // p = decodeURIComponent(p);
+    // return p;
+    console.log(body);
+    okcUser = body.postUser;
+    pwd = body.postP;
+    msg = body.postMsg;
     try {
-        console.log("Entering  okc get API call....");
-        var p = parseP(req.query.p);
+        console.log("Entering  okc fun....");
+        // var p = parseP(req.query.p);
         const browser = await puppeteer.launch({
-            // headless: false
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            headless: false,
+            // args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         const page = await browser.newPage();
         page.setViewport({ width: 1200, height: 800 })
@@ -76,7 +47,7 @@ app.get('/okc', async function(req, res) {
         await page.keyboard.type(CREDS.username);
 
         await page.click(PASSWORD_SELECTOR);
-        await page.keyboard.type(p);
+        await page.keyboard.type(pwd);
 
         await page.click(BUTTON_SELECTOR);
 
@@ -113,21 +84,45 @@ app.get('/okc', async function(req, res) {
             await pages[2].waitFor(1000);
 
             await pages[2].close();
-            console.log("count"+ i);
+            console.log("count: "+ i);
 
         }
         browser.close();
-        res.send({ hello: "world" });
+        return { hello: "world" };
+        // res.send({ hello: "world" });
 
     } catch(err){
-        console.log("Exiting  okc get API call.... with error");
+        console.log("Exiting  okc fun.... with error");
         console.log ("error: ", err);
+        return { hello: "world with error" };
     }
+};
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get('/api/hello', (req, res) => {
+    res.send({ express: 'Hello From Express' });
+});
+app.post('/api/world', (req, res) => {
+    console.log(req.body);
+    okcUser = req.body.postUser;
+    pwd = req.body.postP;
+    msg = req.body.postMsg;
+
+    res.send(
+        `I received your POST request. This is what you sent me: ${okcUser}` +
+        `I received your POST request. This is what you sent me: ${req.body.postP}` +
+        `I received your POST request. This is what you sent me: ${req.body.postMsg}`,
+    );
+});
+
+app.post('/okc', function(req, res) {
+    console.log("Entering  okc get API call....");
+    var ok = okc(req.body);
+    console.log("Exiting  okc get API call....");
+    res.send("Okc called");
 
 });
 
-const server = app.listen(process.env.PORT || 8080, err => {
-    if (err) return console.error(err);
-    const port = server.address().port;
-    console.info(`App listening on port ${port}`);
-});
+app.listen(port, () => console.log(`Listening on port ${port}`));
