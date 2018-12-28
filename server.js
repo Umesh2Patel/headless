@@ -41,7 +41,7 @@ var okc = async function(body) {
         const closeBtn = '#global_messaging_V2 > div > div > div.messenger-user-row.messenger-main-window-user-row > button.messenger-user-row-close';
         // const closeBtnOLD = '#global_messaging_container > div.global_messaging.initial-render.no_messages > div.header.old_template > div.controls > button.close > i';
         await page.goto('https://okcupid.com/login');
-        await page.screenshot({ path: 'screenshots/okc.png' });
+        // await page.screenshot({ path: 'screenshots/okc.png' });
 
         await page.click(USERNAME_SELECTOR);
         await page.keyboard.type(CREDS.username);
